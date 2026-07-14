@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.jfplastic.controller.ClienteController"
+      style="-fx-padding: 20;">
+
+    <Label text="Cadastro de Clientes" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" />
+
+    <HBox spacing="10">
+        <TextField fx:id="txtPesquisa" promptText="Pesquisar por nome..." HBox.hgrow="ALWAYS" />
+        <Button text="Pesquisar" onAction="#pesquisar" />
+        <Button text="Cadastrar" onAction="#cadastrar" />
+        <Button text="Salvar" onAction="#salvar" />
+        <Button text="Cancelar" onAction="#cancelar" />
+        <Button text="Editar" onAction="#editar" />
+        <Button text="Excluir" onAction="#excluir" />
+    </HBox>
+
+    <!-- TableView sem colunas definidas no FXML -->
+    <TableView fx:id="tabelaClientes" VBox.vgrow="ALWAYS" />
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Nome:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="txtNome" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Telefone:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="txtTelefone" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Cidade:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="txtCidade" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label text="Endereço:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="txtEndereco" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label text="Observações:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="txtObservacoes" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    </GridPane>
+</VBox>

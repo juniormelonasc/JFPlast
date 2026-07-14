@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.jfplastic.controller.PrincipalController">
+
+    <top>
+        <VBox>
+            <Label text="JF Plast" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1a237e; -fx-padding: 10 0 0 15;" />
+
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 10 15;">
+                <Button text="Novo Pedido" onAction="#novoPedido" />
+                <Button text="Editar Pedido" onAction="#editarPedido" />
+                <Button text="Clientes" onAction="#abrirClientes" />
+                <Button text="Produtos" onAction="#abrirProdutos" />
+                <Button text="Gerar PDF" onAction="#gerarPDF" />
+                <Button text="Atualizar" onAction="#atualizar" />
+                <Button text="Excluir Pedido" onAction="#excluirPedido" />
+                <Separator orientation="VERTICAL" />
+                <TextField fx:id="txtPesquisa" promptText="Pesquisar..." HBox.hgrow="ALWAYS" />
+                <ComboBox fx:id="comboFiltro" promptText="Filtro" />
+            </HBox>
+
+            <HBox spacing="20" style="-fx-padding: 5 15 10 15;">
+                <Label fx:id="lblTotalPedidos" text="Total Pedidos: 0" />
+                <Label fx:id="lblAtrasados" text="Atrasados: 0" />
+                <Label fx:id="lblHoje" text="Hoje: 0" />
+                <Label fx:id="lblEstaSemana" text="Esta Semana: 0" />
+                <Label fx:id="lblValorTotal" text="Valor Total: R$ 0,00" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TableView fx:id="tabelaPedidos" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="Nº Pedido" prefWidth="80" />
+                <TableColumn fx:id="colCliente" text="Cliente" prefWidth="150" />
+                <TableColumn fx:id="colProduto" text="Produto" prefWidth="150" />
+                <TableColumn fx:id="colQuantidade" text="Quantidade" prefWidth="80" />
+                <TableColumn fx:id="colValorUnitario" text="Valor Unitário" prefWidth="100" />
+                <TableColumn fx:id="colValorTotal" text="Valor Total" prefWidth="100" />
+                <TableColumn fx:id="colDataPedido" text="Data Pedido" prefWidth="100" />
+                <TableColumn fx:id="colDataEntrega" text="Data Entrega" prefWidth="100" />
+                <TableColumn fx:id="colStatus" text="Status" prefWidth="120" />
+                <TableColumn fx:id="colObservacoes" text="Observações" prefWidth="150" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>

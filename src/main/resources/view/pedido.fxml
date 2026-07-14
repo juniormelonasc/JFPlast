@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.jfplastic.controller.PedidoController"
+      style="-fx-padding: 20;">
+
+    <Label text="Cadastro de Pedido" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1a237e;" />
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <ComboBox fx:id="comboCliente" GridPane.columnIndex="1" GridPane.rowIndex="0" prefWidth="250" />
+
+        <Label text="Produto:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <ComboBox fx:id="comboProduto" GridPane.columnIndex="1" GridPane.rowIndex="1" prefWidth="250" />
+
+        <Label text="Quantidade:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="txtQuantidade" GridPane.columnIndex="1" GridPane.rowIndex="2" prefWidth="150" />
+
+        <Label text="Valor Unitário:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="txtValorUnitario" GridPane.columnIndex="1" GridPane.rowIndex="3" prefWidth="150" />
+
+        <Label text="Valor Total:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="txtValorTotal" GridPane.columnIndex="1" GridPane.rowIndex="4" prefWidth="150" editable="false" style="-fx-background-color: #f0f0f0;" />
+
+        <Label text="Data do Pedido:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <DatePicker fx:id="dateDataPedido" GridPane.columnIndex="1" GridPane.rowIndex="5" prefWidth="150" />
+
+        <Label text="Data de Entrega:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+        <DatePicker fx:id="dateDataEntrega" GridPane.columnIndex="1" GridPane.rowIndex="6" prefWidth="150" />
+
+        <Label text="Observações:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+        <TextField fx:id="txtObservacoes" GridPane.columnIndex="1" GridPane.rowIndex="7" prefWidth="400" />
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="btnSalvar" text="Salvar" onAction="#salvar" style="-fx-background-color: #1a237e; -fx-text-fill: white;" />
+        <Button fx:id="btnCancelar" text="Cancelar" onAction="#cancelar" />
+    </HBox>
+</VBox>
