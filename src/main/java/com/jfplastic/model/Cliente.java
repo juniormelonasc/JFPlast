@@ -7,16 +7,18 @@ public class Cliente {
     private String cidade;
     private String endereco;
     private String observacoes;
+    private String cpfCnpj; // NOVO CAMPO
 
     public Cliente() { }
 
-    public Cliente(int id, String nome, String telefone, String cidade, String endereco, String observacoes) {
+    public Cliente(int id, String nome, String telefone, String cidade, String endereco, String observacoes, String cpfCnpj) {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
         this.cidade = cidade;
         this.endereco = endereco;
         this.observacoes = observacoes;
+        this.cpfCnpj = cpfCnpj;
     }
 
     // Getters e Setters
@@ -38,8 +40,11 @@ public class Cliente {
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
 
+    public String getCpfCnpj() { return cpfCnpj; }
+    public void setCpfCnpj(String cpfCnpj) { this.cpfCnpj = cpfCnpj; }
+
     @Override
     public String toString() {
-        return nome; // será usado nas ComboBoxes
+        return nome;
     }
 }

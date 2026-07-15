@@ -12,6 +12,7 @@ public class DatabaseConnection {
         try {
             Connection conn = DriverManager.getConnection(URL);
             criarTabelasSeNaoExistirem(conn);
+            migrarBanco(conn);
             return conn;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -27,7 +28,8 @@ public class DatabaseConnection {
                 telefone TEXT,
                 cidade TEXT,
                 endereco TEXT,
-                observacoes TEXT
+                observacoes TEXT,
+                cpf_cnpj TEXT
             );
         """;
 
@@ -74,6 +76,15 @@ public class DatabaseConnection {
             stmt.execute(sqlPedidoItens);
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao criar tabelas: " + e.getMessage());
+        }
+    }
+
+    private static void migrarBanco(Connection conn) {
+        // Adiciona coluna cpf_cnpj se não existir
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("ALTER TABLE clientes ADD COLUMN cpf_cnpj TEXT");
+        } catch (SQLException e) {
+            // Coluna já existe, ignora
         }
     }
 }

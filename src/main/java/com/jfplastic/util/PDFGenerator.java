@@ -43,13 +43,19 @@ public class PDFGenerator {
         emissao.setSpacingAfter(20);
         document.add(emissao);
 
-        // Dados do cliente
+        // Dados do cliente (incluindo CPF/CNPJ)
         Paragraph clienteTitulo = new Paragraph("Dados do Cliente", fontSubtitulo);
         clienteTitulo.setSpacingAfter(10);
         document.add(clienteTitulo);
 
         Paragraph clienteNome = new Paragraph("Nome: " + pedido.getCliente().getNome(), fontNormal);
         document.add(clienteNome);
+
+        if (pedido.getCliente().getCpfCnpj() != null && !pedido.getCliente().getCpfCnpj().isEmpty()) {
+            Paragraph clienteCpf = new Paragraph("CPF/CNPJ: " + pedido.getCliente().getCpfCnpj(), fontNormal);
+            document.add(clienteCpf);
+        }
+
         Paragraph clienteTelefone = new Paragraph("Telefone: " + pedido.getCliente().getTelefone(), fontNormal);
         clienteTelefone.setSpacingAfter(20);
         document.add(clienteTelefone);
@@ -86,9 +92,9 @@ public class PDFGenerator {
         total.setSpacingAfter(20);
         document.add(total);
 
-        // Observações
+        // Local de entrega (observações)
         if (pedido.getObservacoes() != null && !pedido.getObservacoes().isEmpty()) {
-            Paragraph obsTitulo = new Paragraph("local de entrega:", fontNegrito);
+            Paragraph obsTitulo = new Paragraph("Local de Entrega:", fontNegrito);
             obsTitulo.setSpacingAfter(5);
             document.add(obsTitulo);
             Paragraph obs = new Paragraph(pedido.getObservacoes(), fontNormal);

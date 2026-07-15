@@ -20,23 +20,25 @@
         <Button text="Excluir" onAction="#excluir" />
     </HBox>
 
-    <!-- TableView -->
     <TableView fx:id="tabelaClientes" VBox.vgrow="ALWAYS" />
 
     <GridPane hgap="10" vgap="10">
         <Label text="Nome:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         <TextField fx:id="txtNome" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-        <Label text="Telefone:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="txtTelefone" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Label text="CPF/CNPJ:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="txtCpfCnpj" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-        <Label text="Cidade:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextField fx:id="txtCidade" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <Label text="Telefone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="txtTelefone" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-        <Label text="Endereço:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-        <TextField fx:id="txtEndereco" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Label text="Cidade:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="txtCidade" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-        <Label text="Observações:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-        <TextField fx:id="txtObservacoes" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+        <Label text="Endereço:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="txtEndereco" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <Label text="Observações:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <TextField fx:id="txtObservacoes" GridPane.columnIndex="1" GridPane.rowIndex="5" />
     </GridPane>
 </VBox>

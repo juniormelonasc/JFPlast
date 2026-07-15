@@ -13,6 +13,7 @@ public class ClienteController {
     @FXML private TextField txtPesquisa;
     @FXML private TableView<Cliente> tabelaClientes;
     @FXML private TextField txtNome;
+    @FXML private TextField txtCpfCnpj;
     @FXML private TextField txtTelefone;
     @FXML private TextField txtCidade;
     @FXML private TextField txtEndereco;
@@ -25,15 +26,16 @@ public class ClienteController {
 
     @FXML
     public void initialize() {
-        // Limpa colunas existentes (evita duplicação)
         tabelaClientes.getColumns().clear();
 
-        // Criar colunas
         TableColumn<Cliente, Integer> colId = new TableColumn<>("Código");
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Cliente, String> colNome = new TableColumn<>("Nome");
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+
+        TableColumn<Cliente, String> colCpfCnpj = new TableColumn<>("CPF/CNPJ");
+        colCpfCnpj.setCellValueFactory(new PropertyValueFactory<>("cpfCnpj"));
 
         TableColumn<Cliente, String> colTelefone = new TableColumn<>("Telefone");
         colTelefone.setCellValueFactory(new PropertyValueFactory<>("telefone"));
@@ -47,20 +49,16 @@ public class ClienteController {
         TableColumn<Cliente, String> colObservacoes = new TableColumn<>("Observações");
         colObservacoes.setCellValueFactory(new PropertyValueFactory<>("observacoes"));
 
-        // Adicionar colunas à tabela
-        tabelaClientes.getColumns().addAll(colId, colNome, colTelefone, colCidade, colEndereco, colObservacoes);
+        tabelaClientes.getColumns().addAll(colId, colNome, colCpfCnpj, colTelefone, colCidade, colEndereco, colObservacoes);
 
-        // Carregar dados
         carregarTabela();
 
-        // Listener para seleção de linha
         tabelaClientes.getSelectionModel().selectedItemProperty().addListener((obs, old, novo) -> {
             if (novo != null) {
                 selecionarCliente(novo);
             }
         });
 
-        // Inicializar campos desabilitados
         setCamposEditaveis(false);
     }
 
@@ -72,6 +70,7 @@ public class ClienteController {
     private void selecionarCliente(Cliente cliente) {
         clienteSelecionado = cliente;
         txtNome.setText(cliente.getNome());
+        txtCpfCnpj.setText(cliente.getCpfCnpj());
         txtTelefone.setText(cliente.getTelefone());
         txtCidade.setText(cliente.getCidade());
         txtEndereco.setText(cliente.getEndereco());
@@ -84,6 +83,8 @@ public class ClienteController {
     private void setCamposEditaveis(boolean editavel) {
         txtNome.setEditable(editavel);
         txtNome.setDisable(!editavel);
+        txtCpfCnpj.setEditable(editavel);
+        txtCpfCnpj.setDisable(!editavel);
         txtTelefone.setEditable(editavel);
         txtTelefone.setDisable(!editavel);
         txtCidade.setEditable(editavel);
@@ -96,6 +97,7 @@ public class ClienteController {
 
     private void limparCampos() {
         txtNome.clear();
+        txtCpfCnpj.clear();
         txtTelefone.clear();
         txtCidade.clear();
         txtEndereco.clear();
@@ -151,6 +153,7 @@ public class ClienteController {
                     : new Cliente();
 
             cliente.setNome(nome);
+            cliente.setCpfCnpj(txtCpfCnpj.getText().trim());
             cliente.setTelefone(txtTelefone.getText().trim());
             cliente.setCidade(txtCidade.getText().trim());
             cliente.setEndereco(txtEndereco.getText().trim());
