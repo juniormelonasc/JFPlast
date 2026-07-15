@@ -2,33 +2,32 @@ package com.jfplastic.model;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pedido {
     private int id;
     private Cliente cliente;
-    private Produto produto;
-    private int quantidade;
-    private double valorUnitario;
-    private double valorTotal;
     private LocalDate dataPedido;
     private LocalDate dataEntrega;
-    private String observacoes;
+    private String observacoes;   // Mantido para o DAO e PDFGenerator
+    private String localEntrega;  // Mantido para a coluna FXML
+    private boolean entregue;
+    private double valorTotal;
+    private List<PedidoItem> itens = new ArrayList<>();
 
-    // Construtores
     public Pedido() { }
 
-    public Pedido(int id, Cliente cliente, Produto produto, int quantidade,
-                  double valorUnitario, double valorTotal, LocalDate dataPedido,
-                  LocalDate dataEntrega, String observacoes) {
+    public Pedido(int id, Cliente cliente, LocalDate dataPedido, LocalDate dataEntrega,
+                  String observacoes, String localEntrega, boolean entregue, double valorTotal) {
         this.id = id;
         this.cliente = cliente;
-        this.produto = produto;
-        this.quantidade = quantidade;
-        this.valorUnitario = valorUnitario;
-        this.valorTotal = valorTotal;
         this.dataPedido = dataPedido;
         this.dataEntrega = dataEntrega;
         this.observacoes = observacoes;
+        this.localEntrega = localEntrega;
+        this.entregue = entregue;
+        this.valorTotal = valorTotal;
     }
 
     // Getters e Setters
@@ -37,18 +36,6 @@ public class Pedido {
 
     public Cliente getCliente() { return cliente; }
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
-
-    public Produto getProduto() { return produto; }
-    public void setProduto(Produto produto) { this.produto = produto; }
-
-    public int getQuantidade() { return quantidade; }
-    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
-
-    public double getValorUnitario() { return valorUnitario; }
-    public void setValorUnitario(double valorUnitario) { this.valorUnitario = valorUnitario; }
-
-    public double getValorTotal() { return valorTotal; }
-    public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
 
     public LocalDate getDataPedido() { return dataPedido; }
     public void setDataPedido(LocalDate dataPedido) { this.dataPedido = dataPedido; }
@@ -59,11 +46,37 @@ public class Pedido {
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
 
-    /**
-     * Calcula o status do pedido.
-     * Retorna um array: [cor, texto]
-     */
+    public String getLocalEntrega() { return localEntrega; }
+    public void setLocalEntrega(String localEntrega) { this.localEntrega = localEntrega; }
+
+    public boolean isEntregue() { return entregue; }
+    public void setEntregue(boolean entregue) { this.entregue = entregue; }
+
+    public double getValorTotal() { return valorTotal; }
+    public void setValorTotal(double valorTotal) { this.valorTotal = valorTotal; }
+
+    public List<PedidoItem> getItens() { return itens; }
+    public void setItens(List<PedidoItem> itens) { this.itens = itens; }
+
+    public void adicionarItem(PedidoItem item) {
+        itens.add(item);
+        recalcularTotal();
+    }
+
+    public void removerItem(PedidoItem item) {
+        itens.remove(item);
+        recalcularTotal();
+    }
+
+    private void recalcularTotal() {
+        valorTotal = itens.stream().mapToDouble(PedidoItem::getValorTotal).sum();
+    }
+
     public String[] calcularStatus() {
+        if (entregue) {
+            return new String[]{"VERDE", "Entregue"};
+        }
+
         LocalDate hoje = LocalDate.now();
         long dias = ChronoUnit.DAYS.between(hoje, dataEntrega);
 

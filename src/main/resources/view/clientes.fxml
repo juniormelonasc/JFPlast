@@ -20,7 +20,7 @@
         <Button text="Excluir" onAction="#excluir" />
     </HBox>
 
-    <!-- TableView sem colunas definidas no FXML -->
+    <!-- TableView -->
     <TableView fx:id="tabelaClientes" VBox.vgrow="ALWAYS" />
 
     <GridPane hgap="10" vgap="10">

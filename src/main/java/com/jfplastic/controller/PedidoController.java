@@ -2,20 +2,22 @@ package com.jfplastic.controller;
 
 import com.jfplastic.model.Cliente;
 import com.jfplastic.model.Pedido;
+import com.jfplastic.model.PedidoItem;
 import com.jfplastic.model.Produto;
 import com.jfplastic.service.ClienteService;
 import com.jfplastic.service.PedidoService;
 import com.jfplastic.service.ProdutoService;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.StringConverter;
 
+import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class PedidoController {
 
@@ -23,97 +25,146 @@ public class PedidoController {
     @FXML private ComboBox<Produto> comboProduto;
     @FXML private TextField txtQuantidade;
     @FXML private TextField txtValorUnitario;
-    @FXML private TextField txtValorTotal;
+    @FXML private TextField txtValorTotalPedido;
     @FXML private DatePicker dateDataPedido;
     @FXML private DatePicker dateDataEntrega;
     @FXML private TextField txtObservacoes;
-    @FXML private Button btnSalvar;
-    @FXML private Button btnCancelar;
+    @FXML private TableView<PedidoItem> tabelaItens;
+    @FXML private TableColumn<PedidoItem, String> colProduto;
+    @FXML private TableColumn<PedidoItem, Integer> colQuantidade;
+    @FXML private TableColumn<PedidoItem, Double> colValorUnitario;
+    @FXML private TableColumn<PedidoItem, Double> colValorTotalItem;
 
     private PedidoService pedidoService = new PedidoService();
     private ClienteService clienteService = new ClienteService();
     private ProdutoService produtoService = new ProdutoService();
 
     private Pedido pedidoEditando;
-    private ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
-    private ObservableList<Produto> listaProdutos = FXCollections.observableArrayList();
+    private ObservableList<PedidoItem> itens = FXCollections.observableArrayList();
 
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     @FXML
     public void initialize() {
-        // Configurar combos
         comboCliente.setConverter(new StringConverter<Cliente>() {
             @Override
             public String toString(Cliente cliente) {
                 return cliente != null ? cliente.getNome() : "";
             }
-
             @Override
-            public Cliente fromString(String string) {
-                return null;
-            }
+            public Cliente fromString(String string) { return null; }
         });
 
         comboProduto.setConverter(new StringConverter<Produto>() {
             @Override
             public String toString(Produto produto) {
-                return produto != null ? produto.getNome() + " - R$ " + produto.getPrecoUnitario() : "";
+                return produto != null ? produto.getNome() + " - " + currencyFormat.format(produto.getPrecoUnitario()) : "";
             }
-
             @Override
-            public Produto fromString(String string) {
-                return null;
-            }
+            public Produto fromString(String string) { return null; }
         });
 
-        // Carregar dados dos combos
         carregarCombos();
 
-        // Listener para preencher preço unitário ao selecionar produto
         comboProduto.valueProperty().addListener((obs, old, novo) -> {
             if (novo != null) {
                 txtValorUnitario.setText(String.valueOf(novo.getPrecoUnitario()));
-                calcularTotal();
             }
         });
 
-        // Listeners para calcular total
-        txtQuantidade.textProperty().addListener(this::calcularTotalListener);
-        txtValorUnitario.textProperty().addListener(this::calcularTotalListener);
+        colProduto.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().getProduto().getNome()));
+        colQuantidade.setCellValueFactory(new PropertyValueFactory<>("quantidade"));
+        colValorUnitario.setCellValueFactory(new PropertyValueFactory<>("valorUnitario"));
+        colValorTotalItem.setCellValueFactory(new PropertyValueFactory<>("valorTotal"));
 
-        // Data atual como padrão
+        colValorUnitario.setCellFactory(column -> new TableCell<PedidoItem, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : currencyFormat.format(item));
+            }
+        });
+        colValorTotalItem.setCellFactory(column -> new TableCell<PedidoItem, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : currencyFormat.format(item));
+            }
+        });
+
+        tabelaItens.setItems(itens);
+
         dateDataPedido.setValue(LocalDate.now());
         dateDataEntrega.setValue(LocalDate.now().plusDays(7));
+
+        itens.addListener((javafx.collections.ListChangeListener.Change<? extends PedidoItem> c) -> {
+            atualizarTotalPedido();
+        });
     }
 
     private void carregarCombos() {
-        listaClientes.setAll(clienteService.listarTodos());
-        comboCliente.setItems(listaClientes);
-
-        listaProdutos.setAll(produtoService.listarTodos());
-        comboProduto.setItems(listaProdutos);
+        comboCliente.setItems(FXCollections.observableArrayList(clienteService.listarTodos()));
+        comboProduto.setItems(FXCollections.observableArrayList(produtoService.listarTodos()));
     }
 
-    private void calcularTotal() {
-        try {
-            String qtdText = txtQuantidade.getText().trim();
-            String valorText = txtValorUnitario.getText().trim().replace(",", ".");
-            if (qtdText.isEmpty() || valorText.isEmpty()) {
-                txtValorTotal.setText("");
-                return;
-            }
-            int quantidade = Integer.parseInt(qtdText);
-            double valorUnitario = Double.parseDouble(valorText);
-            double total = quantidade * valorUnitario;
-            txtValorTotal.setText(String.format("%.2f", total));
-        } catch (NumberFormatException e) {
-            // Ignora
+    @FXML
+    private void adicionarItem() {
+        Produto produto = comboProduto.getValue();
+        if (produto == null) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Selecione um produto.");
+            return;
         }
+
+        int quantidade;
+        try {
+            quantidade = Integer.parseInt(txtQuantidade.getText().trim());
+            if (quantidade <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Quantidade inválida (deve ser maior que zero).");
+            return;
+        }
+
+        double valorUnitario;
+        try {
+            valorUnitario = Double.parseDouble(txtValorUnitario.getText().trim().replace(",", "."));
+            if (valorUnitario <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Valor unitário inválido.");
+            return;
+        }
+
+        double valorTotal = quantidade * valorUnitario;
+
+        PedidoItem item = new PedidoItem();
+        item.setProduto(produto);
+        item.setQuantidade(quantidade);
+        item.setValorUnitario(valorUnitario);
+        item.setValorTotal(valorTotal);
+
+        itens.add(item);
+
+        comboProduto.setValue(null);
+        txtQuantidade.clear();
+        txtValorUnitario.clear();
+
+        atualizarTotalPedido();
     }
 
-    private void calcularTotalListener(ObservableValue<? extends String> obs, String old, String novo) {
-        calcularTotal();
+    @FXML
+    private void removerItem() {
+        PedidoItem selecionado = tabelaItens.getSelectionModel().getSelectedItem();
+        if (selecionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Aviso", "Selecione um item para remover.");
+            return;
+        }
+        itens.remove(selecionado);
+        atualizarTotalPedido();
+    }
+
+    private void atualizarTotalPedido() {
+        double total = itens.stream().mapToDouble(PedidoItem::getValorTotal).sum();
+        txtValorTotalPedido.setText(currencyFormat.format(total));
     }
 
     @FXML
@@ -125,33 +176,8 @@ public class PedidoController {
                 return;
             }
 
-            Produto produto = comboProduto.getValue();
-            if (produto == null) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Selecione um produto.");
-                return;
-            }
-
-            int quantidade;
-            try {
-                quantidade = Integer.parseInt(txtQuantidade.getText().trim());
-                if (quantidade <= 0) {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Quantidade deve ser maior que zero.");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Quantidade inválida.");
-                return;
-            }
-
-            double valorUnitario;
-            try {
-                valorUnitario = Double.parseDouble(txtValorUnitario.getText().trim().replace(",", "."));
-                if (valorUnitario <= 0) {
-                    mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Valor unitário deve ser maior que zero.");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Valor unitário inválido.");
+            if (itens.isEmpty()) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Adicione pelo menos um produto ao pedido.");
                 return;
             }
 
@@ -168,21 +194,16 @@ public class PedidoController {
             }
 
             if (dataEntrega.isBefore(dataPedido)) {
-                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "A data de entrega não pode ser anterior à data do pedido.");
+                mostrarAlerta(Alert.AlertType.ERROR, "Erro", "Data de entrega não pode ser anterior à data do pedido.");
                 return;
             }
 
-            double valorTotal = quantidade * valorUnitario;
-
             Pedido pedido = (pedidoEditando != null) ? pedidoEditando : new Pedido();
             pedido.setCliente(cliente);
-            pedido.setProduto(produto);
-            pedido.setQuantidade(quantidade);
-            pedido.setValorUnitario(valorUnitario);
-            pedido.setValorTotal(valorTotal);
             pedido.setDataPedido(dataPedido);
             pedido.setDataEntrega(dataEntrega);
             pedido.setObservacoes(txtObservacoes.getText().trim());
+            pedido.setItens(new ArrayList<>(itens));
 
             pedidoService.salvar(pedido);
             mostrarAlerta(Alert.AlertType.INFORMATION, "Sucesso", "Pedido salvo com sucesso!");
@@ -200,8 +221,7 @@ public class PedidoController {
     }
 
     private void fechar() {
-        Stage stage = (Stage) btnCancelar.getScene().getWindow();
-        stage.close();
+        txtObservacoes.getScene().getWindow().hide();
     }
 
     private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensagem) {
@@ -212,17 +232,13 @@ public class PedidoController {
         alert.showAndWait();
     }
 
-    // Método para carregar pedido para edição (chamado pela tela principal)
     public void setPedidoParaEdicao(Pedido pedido) {
         this.pedidoEditando = pedido;
         comboCliente.setValue(pedido.getCliente());
-        comboProduto.setValue(pedido.getProduto());
-        txtQuantidade.setText(String.valueOf(pedido.getQuantidade()));
-        txtValorUnitario.setText(String.valueOf(pedido.getValorUnitario()));
-        txtValorTotal.setText(String.valueOf(pedido.getValorTotal()));
         dateDataPedido.setValue(pedido.getDataPedido());
         dateDataEntrega.setValue(pedido.getDataEntrega());
         txtObservacoes.setText(pedido.getObservacoes());
-        calcularTotal();
+        itens.setAll(pedido.getItens());
+        atualizarTotalPedido();
     }
 }
